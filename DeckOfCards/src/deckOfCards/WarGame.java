@@ -39,7 +39,17 @@ public class WarGame {
 
         while(true){
             
-            gameState status = checkHands(player1Deck, player2Deck, player1OH, player2OH);
+            gameState status = checkHands(/*player1Deck, player2Deck, player1OH, player2OH*/);
+            
+            if(player1Deck.isEmpty()){
+                player1Deck = players.get(0).getInUseDeck();
+            }
+
+            if(player2Deck.isEmpty()){
+                player2Deck = players.get(1).getInUseDeck();
+            }
+            
+            
             if(status == gameState.PLAYER1WIN){
                 break;
             }else if( status == gameState.PLAYER2WIN){
@@ -127,7 +137,7 @@ public class WarGame {
             System.out.println("\nP2: Takes pool!!!");
             return false;
         } else if (p1Card.getValue() == p2Card.getValue()) {
-            war(p1OffHand, p2OffHand);
+            // war(p1OffHand, p2OffHand);
         } else {
             System.out.println("Card is null?");
         }
@@ -136,12 +146,12 @@ public class WarGame {
         return true;
     }
 
-    private gameState checkHands(Deck player1Deck, Deck player2Deck, Deck player1OH, Deck player2OH){
-        if(player1Deck.isEmpty()){
-                if(!player1OH.isEmpty()){
+    private gameState checkHands(/*Deck player1Deck, Deck player2Deck, Deck player1OH, Deck player2OH*/){
+        if(players.get(0).getInUseDeck().isEmpty()){
+                if(!players.get(0).getOffHandDeck().isEmpty()){
                     players.get(0).swapInUseAndOffHand();
-                    player1Deck = players.get(0).getInUseDeck();
-                    player1OH = players.get(0).getOffHandDeck();
+                    // player1Deck = players.get(0).getInUseDeck();
+                    // player1OH = players.get(0).getOffHandDeck();
         
                 }else{
                     System.out.println("Player 2 Wins!!!");
@@ -149,11 +159,11 @@ public class WarGame {
                 }
             }
 
-            if(player2Deck.isEmpty()){
-                if(!player2OH.isEmpty()){
+        if(players.get(1).getInUseDeck().isEmpty()){
+                if(!players.get(1).getOffHandDeck().isEmpty()){
                     players.get(1).swapInUseAndOffHand();
-                    player2Deck = players.get(1).getInUseDeck();
-                    player2OH = players.get(1).getOffHandDeck();
+                    // player2Deck = players.get(1).getInUseDeck();
+                    // player2OH = players.get(1).getOffHandDeck();
 
                 }else{
                     System.out.println("Player 1 Wins!!!");
