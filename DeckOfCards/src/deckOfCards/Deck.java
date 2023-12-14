@@ -34,11 +34,9 @@ public class Deck {
 	
 	public Card drawFromTop() {
 		
-		if (!this.isEmpty()) {
+		if (!this.isEmpty()) 
+			return deck.remove(0);
 			
-			Card topCard = deck.remove(0);
-			return topCard;
-		}
 		return null;
 	}
 

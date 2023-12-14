@@ -6,10 +6,10 @@ public class WarGame {
     private Deck deck;
     private ArrayList<Player> players;
     private int PLAYERCOUNT = 2;
-    private static Deck pool;
+    private Deck pool;
 
     enum gameState{
-        NONE,
+        WAR,
         PLAYER1WIN,
         PLAYER2WIN;
     }
@@ -29,148 +29,118 @@ public class WarGame {
         this.deck.deal(players);
     }
 
-    public void run() {
-        
-        Deck player1Deck = players.get(0).getInUseDeck();
-        Deck player2Deck = players.get(1).getInUseDeck();
+    public void run() throws InterruptedException {
+        /*
+         *Loop while main and offhands are not empty
+         *    Each player draws a card
+         *    Cards are compared to each other
+         *        P1 won: add pool to P1 offhand
+         *        P2 won: add pool to P2 offhand
+         *        Tie: Call war
+         */ 
 
-        Deck player1OH = players.get(0).getOffHandDeck();
-        Deck player2OH = players.get(1).getOffHandDeck();
-
-        while(true){
+        //Continue while both in use hands are not empty
+        while(!this.players.get(0).getInUseDeck().isEmpty() && !this.players.get(1).getInUseDeck().isEmpty()){
             
-            gameState status = checkHands(/*player1Deck, player2Deck, player1OH, player2OH*/);
+            Card p1Card = this.players.get(0).getInUseDeck().drawFromTop();
+            Card p2Card = this.players.get(1).getInUseDeck().drawFromTop();
+            gameState state = compareCards(p1Card, p2Card);
             
-            if(player1Deck.isEmpty()){
-                player1Deck = players.get(0).getInUseDeck();
+            this.pool.addCardToDeck(p1Card);
+            this.pool.addCardToDeck(p2Card);
+            
+            if(state == gameState.WAR){
+                war();
             }
-
-            if(player2Deck.isEmpty()){
-                player2Deck = players.get(1).getInUseDeck();
-            }
             
+            //Check eligibity for hand swap
+            giveWinnings(state);
+            checkHands();
             
-            if(status == gameState.PLAYER1WIN){
-                break;
-            }else if( status == gameState.PLAYER2WIN){
-                break;
-            }
-
-
-            Card p1Card = player1Deck.drawFromTop();
-            Card p2Card = player2Deck.drawFromTop();
-
-            System.out.println("Player 1 Deck size: " + player1Deck.deckSize());
-            System.out.println("Player 1 OH Deck size: " + player1OH.deckSize());
-            
-            System.out.println("Player 2 Deck size: " + player2Deck.deckSize());
-            System.out.println("Player 2 OH Deck size: " + player2OH.deckSize());
-
-            if(player1Deck.deckSize() == 1){
-                System.out.println("stuff");
-            }
-
-            compareCards(p1Card, p2Card, player1OH, player2OH);
+            Thread.sleep(650);
         }
-        
     }
 
-    public void war(Deck p1OffHand, Deck p2OffHand) {
+    /*
+     * 
+     */
+    public void war() {
         /*
-         * Interesting bug
-         * If I get into double or more war I lose the previous wars (Fixed)
-         * Not holding played cards in pool
+         * For filling pool with 3 cards from each player:
+        *       As I draw a card I should check if the card is null
+        *       if the card is null 
+        *            I should check hands
+        *            Draw a card again
+        *       else
+        *            add card to pool
+         * ----
+         * Draw 1 card from each player
+         * Compare cards
+         * Give winnings
          * 
          * 
          */
-        System.out.println("Declaring War!!!");
-
-        for (int i = 0; i < 3; i++) {
-            for (Player player : players) {
-
-                if (!player.getInUseDeck().isEmpty()) {
-                    pool.addCardToDeck(player.getInUseDeck().drawFromTop());
-                } else {
-                    player.setInUseDeck(player.getOffHandDeck());
-                    pool.addCardToDeck(player.getInUseDeck().drawFromTop());
-                }
-            }
-        }
-
-        Card p1Card = players.get(0).getInUseDeck().drawFromTop();
-        Card p2Card = players.get(1).getInUseDeck().drawFromTop();
-        pool.addCardToDeck(p1Card);
-        pool.addCardToDeck(p2Card);
-
-        System.out.println("P1: [] [] []");
-
-        System.out.println("P2: [] [] []");
-        if (compareCards(p1Card, p2Card, p1OffHand, p2OffHand)) {
-
-            p1OffHand.addCardsToDeck(pool);
-        } else {
-            p2OffHand.addCardsToDeck(pool);
-        }
+        System.out.println("War should be called\n");
     }
 
-    private boolean compareCards(Card p1Card, Card p2Card, Deck p1OffHand, Deck p2OffHand) {
+    /*
+     * Compare cards in play. Returns who won current battle or if there was a tie.
+     */
+    private gameState compareCards(Card p1Card, Card p2Card) {
+        System.out.println("P1: " + p1Card);
+        System.out.println("P2: " + p2Card);
 
-        if (p1Card.getValue() > p2Card.getValue()) {
-            System.out.println("\nP1: " + p1Card);
-            System.out.println("P2: " + p2Card);
+        if(p1Card.getValue() > p2Card.getValue()){
+            System.out.println("Player 1 wins the battle!\n");
+            return gameState.PLAYER1WIN;
 
-            // Player one takes pool
-            p1OffHand.addCardToDeck(p1Card);
-            p1OffHand.addCardToDeck(p2Card);
-
-            System.out.println("\nP1: Takes pool!!!");
-            return true;
-
-        } else if (p1Card.getValue() < p2Card.getValue()) {
-            System.out.println("\nP1: " + p1Card);
-            System.out.println("P2: " + p2Card);
-
-            // Player two takes pool
-            p2OffHand.addCardToDeck(p1Card);
-            p2OffHand.addCardToDeck(p2Card);
-
-            System.out.println("\nP2: Takes pool!!!");
-            return false;
-        } else if (p1Card.getValue() == p2Card.getValue()) {
-            // war(p1OffHand, p2OffHand);
-        } else {
-            System.out.println("Card is null?");
+        }else if(p1Card.getValue() < p2Card.getValue()){
+            System.out.println("Player 2 wins the battle!\n");
+            return gameState.PLAYER2WIN;
         }
 
-        // shouldnt reach here
-        return true;
+        return gameState.WAR;
     }
 
-    private gameState checkHands(/*Deck player1Deck, Deck player2Deck, Deck player1OH, Deck player2OH*/){
-        if(players.get(0).getInUseDeck().isEmpty()){
-                if(!players.get(0).getOffHandDeck().isEmpty()){
-                    players.get(0).swapInUseAndOffHand();
-                    // player1Deck = players.get(0).getInUseDeck();
-                    // player1OH = players.get(0).getOffHandDeck();
-        
-                }else{
-                    System.out.println("Player 2 Wins!!!");
-                    return gameState.PLAYER2WIN;
-                }
-            }
+    private void checkHands(){
+        if(this.players.get(0).getInUseDeck().isEmpty()){
+            if(!this.players.get(0).getOffHandDeck().isEmpty()){
+                this.players.get(0).swapInUseAndOffHand();
 
-        if(players.get(1).getInUseDeck().isEmpty()){
-                if(!players.get(1).getOffHandDeck().isEmpty()){
-                    players.get(1).swapInUseAndOffHand();
-                    // player2Deck = players.get(1).getInUseDeck();
-                    // player2OH = players.get(1).getOffHandDeck();
-
-                }else{
-                    System.out.println("Player 1 Wins!!!");
-                    return gameState.PLAYER1WIN;
-                }
+                int handsize = this.players.get(0).getInUseDeck().deckSize();
+                int offhandSize = this.players.get(0).getOffHandDeck().deckSize();
+                System.out.println("P1: Swapped hands\n " + "In Use size: " + handsize + "\nOffhand size: " + offhandSize);
+            }else{
+                System.out.println("Player 2 wins the game!");
             }
-        return gameState.NONE;
+        }
+
+        if(this.players.get(1).getInUseDeck().isEmpty()){
+            if(!this.players.get(1).getOffHandDeck().isEmpty()){
+                this.players.get(1).swapInUseAndOffHand();
+                // System.out.println("P2: Swapped hands");
+
+                int handsize = this.players.get(1).getInUseDeck().deckSize();
+                int offhandSize = this.players.get(1).getOffHandDeck().deckSize();
+                System.out.println("P2: Swapped hands\n " + "In Use size: " + handsize + "\nOffhand size: " + offhandSize);
+            }else{
+                System.out.println("Player 2 wins the game!");
+            }
+        }
+        System.out.println("\n");
+    }
+
+    private void giveWinnings(gameState state){
+        switch (state) {
+            case PLAYER1WIN:
+                this.players.get(0).getOffHandDeck().addCardsToDeck(this.pool);
+                break;
+            case PLAYER2WIN:
+                this.players.get(1).getOffHandDeck().addCardsToDeck(this.pool);
+                break;            
+            default:
+                break;
+        }
     }
 
     private void displayPlayerHands() {
