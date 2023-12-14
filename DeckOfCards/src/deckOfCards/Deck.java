@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
+//Test
 public class Deck {
 	private ArrayList<Card> deck;
 	private int STDDECKSIZE = 52;
