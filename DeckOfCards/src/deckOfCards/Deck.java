@@ -2,6 +2,7 @@ package deckOfCards;
 import java.util.ArrayList;
 import java.util.Random;
 
+
 public class Deck {
 	private ArrayList<Card> deck;
 	private int STDDECKSIZE = 52;
