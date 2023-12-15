@@ -25,20 +25,25 @@ public class Deck {
 				cardValue = 0;
 				suit++;
 			}
+			
+			if(cardValue == 0){
+				
+				Card card = new Card(Card.faceValues[cardValue], 9000, Card.suits[suit]);			
+				this.addCardToDeck(card);
 
-			Card card = new Card(Card.faceValues[cardValue], cardValue + 1, Card.suits[suit]);
-			this.addCardToDeck(card);
+			}else{
+				Card card = new Card(Card.faceValues[cardValue], cardValue + 1, Card.suits[suit]);
+				this.addCardToDeck(card);
+			}
 			cardValue++;
 		}
 	}
 	
 	public Card drawFromTop() {
 		
-		if (!this.isEmpty()) {
+		if (!this.isEmpty()) 
+			return deck.remove(0);
 			
-			Card topCard = deck.remove(0);
-			return topCard;
-		}
 		return null;
 	}
 
