@@ -14,13 +14,10 @@ public class WarGame {
         PLAYER2WIN;
     }
 
-    public WarGame() {
-        this.deck = new Deck();
+    public WarGame() throws InvalidException {
+        this.deck = new Deck("war");
         this.players = new ArrayList<>();
         pool = new Deck();
-
-        this.deck.fillDeck();
-        this.deck.shuffleDeck();
 
         for (int i = 0; i < this.PLAYERCOUNT; i++) {
             this.players.add(new Player());
@@ -136,8 +133,8 @@ public class WarGame {
                 this.players.get(0).swapInUseAndOffHand();
                 this.players.get(0).getInUseDeck().shuffleDeck();
 
-                int handsize = this.players.get(0).getInUseDeck().deckSize();
-                int offhandSize = this.players.get(0).getOffHandDeck().deckSize();
+                // int handsize = this.players.get(0).getInUseDeck().deckSize();
+                // int offhandSize = this.players.get(0).getOffHandDeck().deckSize();
                 // System.out.println("\nP1: Swapped hands" + "\nIn Use size: " + handsize + "\nOffhand size: " + offhandSize);
             }else{
                 System.out.println("Player 2 wins the game!");
@@ -155,8 +152,8 @@ public class WarGame {
                 this.players.get(1).swapInUseAndOffHand();
                 this.players.get(1).getInUseDeck().shuffleDeck();
 
-                int handsize = this.players.get(1).getInUseDeck().deckSize();
-                int offhandSize = this.players.get(1).getOffHandDeck().deckSize();
+                // int handsize = this.players.get(1).getInUseDeck().deckSize();
+                // int offhandSize = this.players.get(1).getOffHandDeck().deckSize();
                 // System.out.println("\nP2: Swapped hands" + "\nIn Use size: " + handsize + "\nOffhand size: " + offhandSize);
             }else{
                 System.out.println("Player 1 wins the game!");

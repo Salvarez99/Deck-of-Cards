@@ -8,15 +8,51 @@ public class Deck {
 	private ArrayList<Card> deck;
 	private int STDDECKSIZE = 52;
 
-
+	/*
+	 * Creates an empty deck of cards
+	 */
 	public Deck() {
 		deck = new ArrayList<Card>();
 	}
 
 	/*
+	 * creates either a standard deck of cards or deck with attributes for the game war.
+	 */
+	public Deck(String mode) throws InvalidException {
+		deck = new ArrayList<Card>();
+		if(mode.toLowerCase().equals("war")){
+			this.fillDeck();
+			this.shuffleDeck();
+		}else if(mode.toLowerCase().equals("std")){
+			this.stdDeck();
+			this.shuffleDeck();
+		}else{
+			throw new InvalidException("Not a valid mode. (std / war)");
+		}
+
+	}
+
+	private void stdDeck(){
+		int suit = 0;
+		int cardValue = 0;
+
+		for (int i = 0; i < this.STDDECKSIZE; i++) {
+			if (cardValue == 13) {
+				cardValue = 0;
+				suit++;
+			}
+			
+			Card card = new Card(Card.faceValues[cardValue], cardValue + 1, Card.suits[suit]);
+			this.addCardToDeck(card);
+			
+			cardValue++;
+		}
+	}
+
+	/*
 	 * Fills deck with cards. Point values are from A - K: 1 - 13
 	 */
-	public void fillDeck() {
+	private void fillDeck() {
 		int suit = 0;
 		int cardValue = 0;
 
@@ -81,6 +117,10 @@ public class Deck {
 				player.getInUseDeck().addCardToDeck(this.drawFromTop());
 			}
 		}
+	}
+
+	public ArrayList<Card> getDeck(){
+		return this.deck;
 	}
 
 	public int deckSize(){
