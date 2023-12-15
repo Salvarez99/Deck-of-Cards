@@ -42,8 +42,20 @@ public class WarGame {
         //Continue while both in use hands are not empty
         while(!this.players.get(0).getInUseDeck().isEmpty() && !this.players.get(1).getInUseDeck().isEmpty()){
             
+            //Sizes are calculated before cards are drawn
+            int handSize = this.players.get(0).getInUseDeck().deckSize();
+            int handSize1 = this.players.get(1).getInUseDeck().deckSize();
+            int offhandSize = this.players.get(0).getOffHandDeck().deckSize();
+            int offhandSize1 = this.players.get(1).getOffHandDeck().deckSize();
+            
             Card p1Card = this.players.get(0).getInUseDeck().drawFromTop();
             Card p2Card = this.players.get(1).getInUseDeck().drawFromTop();
+
+            System.out.println("P1 hand Size: " + handSize);
+            System.out.println("P1 Offhand Size: " + offhandSize);
+            System.out.print("P2 hand Size: " + handSize1+"\n");
+            System.out.print("P2 Offhand Size: " + offhandSize1+"\n");
+            
             gameState state = compareCards(p1Card, p2Card);
             
             this.pool.addCardToDeck(p1Card);
@@ -57,14 +69,11 @@ public class WarGame {
             giveWinnings(state);
             checkHands();
             
-            Thread.sleep(650);
+            Thread.sleep(500);
         }
     }
 
-    /*
-     * 
-     */
-    public void war() {
+    public void war() throws InterruptedException {
         /*
          * For filling pool with 3 cards from each player:
         *       As I draw a card I should check if the card is null
@@ -80,22 +89,41 @@ public class WarGame {
          * 
          * 
          */
-        System.out.println("War should be called\n");
+        System.out.println("Declaring War!!!");
+        System.out.println("P1: [] [] []");
+        System.out.println("P2: [] [] []");
+
+        for (int index = 0; index < 3; index++) {
+            for (Player player : players) {
+
+                Card drawnCard = player.getInUseDeck().drawFromTop();
+
+                if(drawnCard == null){
+                    checkHands();
+                    drawnCard = player.getInUseDeck().drawFromTop();
+                    this.pool.addCardToDeck(drawnCard);
+                }else{
+                    this.pool.addCardToDeck(drawnCard);
+                }
+            }
+        }
+
+        run();
     }
 
     /*
      * Compare cards in play. Returns who won current battle or if there was a tie.
      */
     private gameState compareCards(Card p1Card, Card p2Card) {
-        System.out.println("P1: " + p1Card);
-        System.out.println("P2: " + p2Card);
+        System.out.println("P1:" + "(" + p1Card.getValue() + ") " + p1Card );
+        System.out.println("P2:" + "(" + p2Card.getValue() + ") " + p2Card );
 
         if(p1Card.getValue() > p2Card.getValue()){
-            System.out.println("Player 1 wins the battle!\n");
+            System.out.println("Player 1 wins the battle!");
             return gameState.PLAYER1WIN;
 
         }else if(p1Card.getValue() < p2Card.getValue()){
-            System.out.println("Player 2 wins the battle!\n");
+            System.out.println("Player 2 wins the battle!");
             return gameState.PLAYER2WIN;
         }
 
@@ -106,25 +134,37 @@ public class WarGame {
         if(this.players.get(0).getInUseDeck().isEmpty()){
             if(!this.players.get(0).getOffHandDeck().isEmpty()){
                 this.players.get(0).swapInUseAndOffHand();
+                this.players.get(0).getInUseDeck().shuffleDeck();
 
                 int handsize = this.players.get(0).getInUseDeck().deckSize();
                 int offhandSize = this.players.get(0).getOffHandDeck().deckSize();
-                System.out.println("P1: Swapped hands\n " + "In Use size: " + handsize + "\nOffhand size: " + offhandSize);
+                // System.out.println("\nP1: Swapped hands" + "\nIn Use size: " + handsize + "\nOffhand size: " + offhandSize);
             }else{
                 System.out.println("Player 2 wins the game!");
+
+                int handsize = this.players.get(0).getInUseDeck().deckSize();
+                int offhandSize = this.players.get(0).getOffHandDeck().deckSize();
+                System.out.println("\nP1:" + "\nIn Use size: " + handsize + "\nOffhand size: " + offhandSize);
+
+                System.exit(0);
             }
         }
 
         if(this.players.get(1).getInUseDeck().isEmpty()){
             if(!this.players.get(1).getOffHandDeck().isEmpty()){
                 this.players.get(1).swapInUseAndOffHand();
-                // System.out.println("P2: Swapped hands");
+                this.players.get(1).getInUseDeck().shuffleDeck();
 
                 int handsize = this.players.get(1).getInUseDeck().deckSize();
                 int offhandSize = this.players.get(1).getOffHandDeck().deckSize();
-                System.out.println("P2: Swapped hands\n " + "In Use size: " + handsize + "\nOffhand size: " + offhandSize);
+                // System.out.println("\nP2: Swapped hands" + "\nIn Use size: " + handsize + "\nOffhand size: " + offhandSize);
             }else{
-                System.out.println("Player 2 wins the game!");
+                System.out.println("Player 1 wins the game!");
+
+                int handsize = this.players.get(1).getInUseDeck().deckSize();
+                int offhandSize = this.players.get(1).getOffHandDeck().deckSize();
+                System.out.println("\nP2:" + "\nIn Use size: " + handsize + "\nOffhand size: " + offhandSize);
+                System.exit(0);
             }
         }
         System.out.println("\n");
@@ -134,9 +174,11 @@ public class WarGame {
         switch (state) {
             case PLAYER1WIN:
                 this.players.get(0).getOffHandDeck().addCardsToDeck(this.pool);
+                this.pool = new Deck();
                 break;
             case PLAYER2WIN:
                 this.players.get(1).getOffHandDeck().addCardsToDeck(this.pool);
+                this.pool = new Deck();
                 break;            
             default:
                 break;

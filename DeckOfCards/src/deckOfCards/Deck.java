@@ -25,9 +25,16 @@ public class Deck {
 				cardValue = 0;
 				suit++;
 			}
+			
+			if(cardValue == 0){
+				
+				Card card = new Card(Card.faceValues[cardValue], 9000, Card.suits[suit]);			
+				this.addCardToDeck(card);
 
-			Card card = new Card(Card.faceValues[cardValue], cardValue + 1, Card.suits[suit]);
-			this.addCardToDeck(card);
+			}else{
+				Card card = new Card(Card.faceValues[cardValue], cardValue + 1, Card.suits[suit]);
+				this.addCardToDeck(card);
+			}
 			cardValue++;
 		}
 	}
