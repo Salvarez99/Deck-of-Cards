@@ -3,6 +3,8 @@ package deckOfCards;
 import java.util.ArrayList;
 
 public class BlackJack{
+
+    //Can make use of a hashmap to keep track of player scores
     private ArrayList<Player> players;
     private ArrayList<Integer> playerScores;
     private Deck deck;
