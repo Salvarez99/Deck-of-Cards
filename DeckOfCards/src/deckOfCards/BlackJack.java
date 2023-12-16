@@ -105,7 +105,7 @@ public class BlackJack{
         //if there is one key in the list, then there is one winner
         //if there is more than one key in the list, then it is a tie (no one wins or loses)
         for (Map.Entry<Player, Integer> playerScores : this.playerScores.entrySet()) {
-            this.playerScores.    
+               
         }
     }
 }
